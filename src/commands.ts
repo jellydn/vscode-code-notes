@@ -651,6 +651,46 @@ export async function exportHtml(): Promise<void> {
   window.showInformationMessage(`Exported ${comments.length} comments to review-report.html`)
 }
 
+async function pickPromptTemplate(formattedComments: string, files: string[]): Promise<string | undefined> {
+  const config = workspace.getConfiguration()
+  const promptTemplates = config.get<Record<string, string>>(configs.promptTemplates.key, configs.promptTemplates.default as Record<string, string>)
+
+  const templateNames = Object.keys(promptTemplates)
+  const quickPickItems: { label: string, value: string | null }[] = templateNames.map(name => ({
+    label: name,
+    value: promptTemplates[name],
+  }))
+  quickPickItems.push({ label: '$(edit) Custom...', value: null })
+
+  const selected = await window.showQuickPick(quickPickItems, {
+    placeHolder: 'Select a prompt template',
+    title: 'Prompt Template',
+  })
+
+  if (!selected) {
+    return undefined
+  }
+
+  let template: string
+  if (selected.value === null) {
+    const customPrompt = await window.showInputBox({
+      prompt: 'Enter custom prompt (use {{comments}} and {{files}} as placeholders)',
+      placeHolder: 'Review these comments: {{comments}}',
+    })
+    if (!customPrompt) {
+      return undefined
+    }
+    template = customPrompt
+  }
+  else {
+    template = selected.value
+  }
+
+  return template
+    .replace(/\{\{comments\}\}/g, formattedComments)
+    .replace(/\{\{files\}\}/g, files.join('\n'))
+}
+
 export async function sendToAI(): Promise<void> {
   if (!await ensureInitialized()) {
     return
@@ -664,17 +704,16 @@ export async function sendToAI(): Promise<void> {
     return
   }
 
+  const { formattedComments, files } = formatCommentsForAI(comments)
+  const prompt = await pickPromptTemplate(formattedComments, files)
+
+  if (!prompt) {
+    return
+  }
+
   const config = workspace.getConfiguration()
   const aiTool = config.get<string>(configs.aiTool.key, configs.aiTool.default)
   const aiToolCommand = config.get<string>(configs.aiToolCommand.key, configs.aiToolCommand.default)
-  const promptTemplates = config.get<Record<string, string>>(configs.promptTemplates.key, configs.promptTemplates.default as Record<string, string>)
-
-  const { formattedComments, files } = formatCommentsForAI(comments)
-
-  const template = promptTemplates.review || configs.promptTemplates.default.review as string
-  const prompt = template
-    .replace(/\{\{comments\}\}/g, formattedComments)
-    .replace(/\{\{files\}\}/g, files.join('\n'))
 
   const command = buildAICommand(aiTool, aiToolCommand, prompt)
 
@@ -732,17 +771,16 @@ export async function sendSelectedToAI(): Promise<void> {
 
   const selectedComments = selectedItems.map(item => item.comment)
 
+  const { formattedComments, files } = formatCommentsForAI(selectedComments)
+  const prompt = await pickPromptTemplate(formattedComments, files)
+
+  if (!prompt) {
+    return
+  }
+
   const config = workspace.getConfiguration()
   const aiTool = config.get<string>(configs.aiTool.key, configs.aiTool.default)
   const aiToolCommand = config.get<string>(configs.aiToolCommand.key, configs.aiToolCommand.default)
-  const promptTemplates = config.get<Record<string, string>>(configs.promptTemplates.key, configs.promptTemplates.default as Record<string, string>)
-
-  const { formattedComments, files } = formatCommentsForAI(selectedComments)
-
-  const template = promptTemplates.review || configs.promptTemplates.default.review as string
-  const prompt = template
-    .replace(/\{\{comments\}\}/g, formattedComments)
-    .replace(/\{\{files\}\}/g, files.join('\n'))
 
   const command = buildAICommand(aiTool, aiToolCommand, prompt)
 
@@ -790,17 +828,16 @@ export async function sendCategoryToAI(): Promise<void> {
     return
   }
 
+  const { formattedComments, files } = formatCommentsForAI(filteredComments)
+  const prompt = await pickPromptTemplate(formattedComments, files)
+
+  if (!prompt) {
+    return
+  }
+
   const config = workspace.getConfiguration()
   const aiTool = config.get<string>(configs.aiTool.key, configs.aiTool.default)
   const aiToolCommand = config.get<string>(configs.aiToolCommand.key, configs.aiToolCommand.default)
-  const promptTemplates = config.get<Record<string, string>>(configs.promptTemplates.key, configs.promptTemplates.default as Record<string, string>)
-
-  const { formattedComments, files } = formatCommentsForAI(filteredComments)
-
-  const template = promptTemplates.review || configs.promptTemplates.default.review as string
-  const prompt = template
-    .replace(/\{\{comments\}\}/g, formattedComments)
-    .replace(/\{\{files\}\}/g, files.join('\n'))
 
   const command = buildAICommand(aiTool, aiToolCommand, prompt)
 

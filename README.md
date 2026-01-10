@@ -103,6 +103,7 @@
 | `codeReview.filterByFilename`  | Code Review: Filter by Filename       |
 | `codeReview.editCommentById`   | Code Review: Edit Comment             |
 | `codeReview.deleteCommentById` | Code Review: Delete Comment           |
+| `codeReview.sendToAI`          | Code Review: Send to AI Review        |
 
 <!-- commands -->
 

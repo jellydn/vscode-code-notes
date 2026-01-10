@@ -101,6 +101,12 @@
         "command": "codeReview.deleteCommentById",
         "title": "Delete Comment",
         "category": "Code Review"
+      },
+      {
+        "command": "codeReview.sendToAI",
+        "title": "Send to AI Review",
+        "category": "Code Review",
+        "icon": "$(sparkle)"
       }
     ],
     "viewsContainers": {
@@ -197,6 +203,11 @@
           "command": "codeReview.clearAll",
           "when": "view == codeReviewComments",
           "group": "danger"
+        },
+        {
+          "command": "codeReview.sendToAI",
+          "when": "view == codeReviewComments",
+          "group": "navigation@3"
         }
       ]
     },
@@ -212,6 +223,11 @@
         "key": "delete",
         "mac": "backspace",
         "when": "focusedView == codeReviewComments && viewItem == comment"
+      },
+      {
+        "command": "codeReview.sendToAI",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a"
       }
     ],
     "configuration": {

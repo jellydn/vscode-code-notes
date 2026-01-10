@@ -70,3 +70,16 @@ Thread: https://ampcode.com/threads/T-019ba931-78b4-77ae-8637-ee371abf7369
   - Use workspace.getConfiguration().get() with configs.X.key and configs.X.default for type-safe config access
   - Terminal commands can be executed via window.createTerminal() and terminal.sendText()
 ---
+
+## Sun Jan 11 2026 - US-006
+Thread: https://ampcode.com/threads/T-019ba933-86ff-7077-8f9f-b4cd5d696337
+- Added codeReview.sendToAI command to package.json with title "Send to AI Review" and icon $(sparkle)
+- Added command to view/title menu for codeReviewComments view with navigation@3 group
+- Added keyboard shortcut Ctrl+Shift+A (Cmd+Shift+A on Mac)
+- Ran pnpm run update to regenerate meta.ts
+- Typecheck and lint pass
+- Files changed: package.json, src/generated/meta.ts
+- **Learnings for future iterations:**
+  - Use navigation@N group to order items in view/title menu
+  - Keybindings use "ctrl+shift+x" format on Windows/Linux and "cmd+shift+x" for Mac
+---

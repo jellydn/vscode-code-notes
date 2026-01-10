@@ -107,6 +107,12 @@
         "title": "Send to AI Review",
         "category": "Code Review",
         "icon": "$(sparkle)"
+      },
+      {
+        "command": "codeReview.sendSelectedToAI",
+        "title": "Send Selected to AI",
+        "category": "Code Review",
+        "icon": "$(checklist)"
       }
     ],
     "viewsContainers": {

@@ -685,6 +685,74 @@ export async function sendToAI(): Promise<void> {
   window.showInformationMessage(`Sent ${comments.length} comments to AI review`)
 }
 
+export async function sendSelectedToAI(): Promise<void> {
+  if (!await ensureInitialized()) {
+    return
+  }
+
+  const storage = getStorage()
+  const allComments = storage.getAll()
+
+  if (allComments.length === 0) {
+    window.showErrorMessage('No comments to send to AI')
+    return
+  }
+
+  const commentsByFile = new Map<string, Comment[]>()
+  for (const comment of allComments) {
+    const existing = commentsByFile.get(comment.filePath) || []
+    existing.push(comment)
+    commentsByFile.set(comment.filePath, existing)
+  }
+
+  const quickPickItems: { label: string, description: string, comment: Comment }[] = []
+  for (const [filePath, fileComments] of commentsByFile) {
+    for (const comment of fileComments) {
+      const lineRange = comment.startLine === comment.endLine
+        ? `${comment.startLine}`
+        : `${comment.startLine}-${comment.endLine}`
+      const truncatedText = comment.text.length > 50 ? `${comment.text.slice(0, 50)}...` : comment.text
+      quickPickItems.push({
+        label: truncatedText,
+        description: `${filePath}:${lineRange}`,
+        comment,
+      })
+    }
+  }
+
+  const selectedItems = await window.showQuickPick(quickPickItems, {
+    canPickMany: true,
+    placeHolder: 'Select comments to send to AI',
+    title: 'Send Selected Comments to AI',
+  })
+
+  if (!selectedItems || selectedItems.length === 0) {
+    return
+  }
+
+  const selectedComments = selectedItems.map(item => item.comment)
+
+  const config = workspace.getConfiguration()
+  const aiTool = config.get<string>(configs.aiTool.key, configs.aiTool.default)
+  const aiToolCommand = config.get<string>(configs.aiToolCommand.key, configs.aiToolCommand.default)
+  const promptTemplates = config.get<Record<string, string>>(configs.promptTemplates.key, configs.promptTemplates.default as Record<string, string>)
+
+  const { formattedComments, files } = formatCommentsForAI(selectedComments)
+
+  const template = promptTemplates.review || configs.promptTemplates.default.review as string
+  const prompt = template
+    .replace(/\{\{comments\}\}/g, formattedComments)
+    .replace(/\{\{files\}\}/g, files.join('\n'))
+
+  const command = buildAICommand(aiTool, aiToolCommand, prompt)
+
+  const terminal = window.createTerminal('AI Review')
+  terminal.sendText(command)
+  terminal.show()
+
+  window.showInformationMessage(`Sent ${selectedComments.length} comments to AI review`)
+}
+
 export function registerCommands(): void {
   commands.registerCommand('codeReview.addComment', addComment)
   commands.registerCommand('codeReview.navigateToComment', navigateToComment)
@@ -699,4 +767,5 @@ export function registerCommands(): void {
   commands.registerCommand('codeReview.exportHtml', exportHtml)
   commands.registerCommand('codeReview.clearAll', clearAll)
   commands.registerCommand('codeReview.sendToAI', sendToAI)
+  commands.registerCommand('codeReview.sendSelectedToAI', sendSelectedToAI)
 }

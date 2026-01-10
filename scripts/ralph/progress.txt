@@ -99,3 +99,19 @@ Thread: https://ampcode.com/threads/T-019ba935-7190-708e-9e2b-d9c4a9af81ea
   - QuickPick items can have custom properties (like comment) to carry data along with display
   - Use canPickMany: true for multi-select QuickPick dialogs
 ---
+
+## Sat Jan 11 2026 - US-008
+Thread: https://ampcode.com/threads/T-019ba947-1575-70c0-971e-60b526ff81d8
+- Implemented sendCategoryToAI command in src/commands.ts
+- Shows QuickPick to select category (bug, question, suggestion, nitpick, note)
+- Filters comments by selected category and sends to AI
+- Shows appropriate message if no comments exist for selected category
+- Registered command as codeReview.sendCategoryToAI
+- Added command to package.json with title "Send Category to AI" and icon $(tag)
+- Ran pnpm run update to regenerate meta.ts
+- Typecheck and lint pass
+- Files changed: src/commands.ts, package.json, src/generated/meta.ts
+- **Learnings for future iterations:**
+  - Reuse existing config access patterns from sendToAI and sendSelectedToAI
+  - Category filtering is simple array filter on the category property
+---

@@ -753,6 +753,64 @@ export async function sendSelectedToAI(): Promise<void> {
   window.showInformationMessage(`Sent ${selectedComments.length} comments to AI review`)
 }
 
+export async function sendCategoryToAI(): Promise<void> {
+  if (!await ensureInitialized()) {
+    return
+  }
+
+  const storage = getStorage()
+  const allComments = storage.getAll()
+
+  if (allComments.length === 0) {
+    window.showErrorMessage('No comments to send to AI')
+    return
+  }
+
+  const categoryItems: { label: string, value: CommentCategory }[] = [
+    { label: '$(bug) Bug', value: 'bug' },
+    { label: '$(question) Question', value: 'question' },
+    { label: '$(lightbulb) Suggestion', value: 'suggestion' },
+    { label: '$(comment) Nitpick', value: 'nitpick' },
+    { label: '$(note) Note', value: 'note' },
+  ]
+
+  const selectedCategory = await window.showQuickPick(categoryItems, {
+    placeHolder: 'Select category to send to AI',
+    title: 'Send Category to AI',
+  })
+
+  if (!selectedCategory) {
+    return
+  }
+
+  const filteredComments = allComments.filter(c => c.category === selectedCategory.value)
+
+  if (filteredComments.length === 0) {
+    window.showInformationMessage(`No ${selectedCategory.value} comments to send to AI`)
+    return
+  }
+
+  const config = workspace.getConfiguration()
+  const aiTool = config.get<string>(configs.aiTool.key, configs.aiTool.default)
+  const aiToolCommand = config.get<string>(configs.aiToolCommand.key, configs.aiToolCommand.default)
+  const promptTemplates = config.get<Record<string, string>>(configs.promptTemplates.key, configs.promptTemplates.default as Record<string, string>)
+
+  const { formattedComments, files } = formatCommentsForAI(filteredComments)
+
+  const template = promptTemplates.review || configs.promptTemplates.default.review as string
+  const prompt = template
+    .replace(/\{\{comments\}\}/g, formattedComments)
+    .replace(/\{\{files\}\}/g, files.join('\n'))
+
+  const command = buildAICommand(aiTool, aiToolCommand, prompt)
+
+  const terminal = window.createTerminal('AI Review')
+  terminal.sendText(command)
+  terminal.show()
+
+  window.showInformationMessage(`Sent ${filteredComments.length} ${selectedCategory.value} comments to AI review`)
+}
+
 export function registerCommands(): void {
   commands.registerCommand('codeReview.addComment', addComment)
   commands.registerCommand('codeReview.navigateToComment', navigateToComment)
@@ -768,4 +826,5 @@ export function registerCommands(): void {
   commands.registerCommand('codeReview.clearAll', clearAll)
   commands.registerCommand('codeReview.sendToAI', sendToAI)
   commands.registerCommand('codeReview.sendSelectedToAI', sendSelectedToAI)
+  commands.registerCommand('codeReview.sendCategoryToAI', sendCategoryToAI)
 }

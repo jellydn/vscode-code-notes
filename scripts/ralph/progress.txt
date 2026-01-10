@@ -83,3 +83,19 @@ Thread: https://ampcode.com/threads/T-019ba933-86ff-7077-8f9f-b4cd5d696337
   - Use navigation@N group to order items in view/title menu
   - Keybindings use "ctrl+shift+x" format on Windows/Linux and "cmd+shift+x" for Mac
 ---
+
+## Sun Jan 11 2026 - US-007
+Thread: https://ampcode.com/threads/T-019ba935-7190-708e-9e2b-d9c4a9af81ea
+- Added sendSelectedToAI command in src/commands.ts with QuickPick for multi-selection
+- QuickPick shows comments grouped by file (label: truncated text up to 50 chars, description: file:lineRange)
+- Uses canPickMany: true for multi-select functionality
+- Selected comments are filtered and sent to AI using existing formatCommentsForAI and buildAICommand
+- Registered command as codeReview.sendSelectedToAI
+- Added command to package.json with title "Send Selected to AI" and icon $(checklist)
+- Ran pnpm run update to regenerate meta.ts
+- Typecheck and lint pass
+- Files changed: src/commands.ts, package.json, src/generated/meta.ts
+- **Learnings for future iterations:**
+  - QuickPick items can have custom properties (like comment) to carry data along with display
+  - Use canPickMany: true for multi-select QuickPick dialogs
+---

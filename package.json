@@ -113,6 +113,12 @@
         "title": "Send Selected to AI",
         "category": "Code Review",
         "icon": "$(checklist)"
+      },
+      {
+        "command": "codeReview.sendCategoryToAI",
+        "title": "Send Category to AI",
+        "category": "Code Review",
+        "icon": "$(tag)"
       }
     ],
     "viewsContainers": {

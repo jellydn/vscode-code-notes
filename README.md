@@ -105,6 +105,7 @@
 | `codeReview.deleteCommentById` | Code Review: Delete Comment           |
 | `codeReview.sendToAI`          | Code Review: Send to AI Review        |
 | `codeReview.sendSelectedToAI`  | Code Review: Send Selected to AI      |
+| `codeReview.sendCategoryToAI`  | Code Review: Send Category to AI      |
 
 <!-- commands -->
 

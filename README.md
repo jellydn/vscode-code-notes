@@ -74,14 +74,15 @@
 
 <!-- configs -->
 
-| Key                                       | Description                                                    | Type      | Default                                                                                              |
-| ----------------------------------------- | -------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------- |
-| `vscode-code-notes.showInlineDecorations` | Show inline text decorations (after-line text preview)         | `boolean` | `true`                                                                                               |
-| `vscode-code-notes.showGutterIcons`       | Show gutter icons for comments                                 | `boolean` | `true`                                                                                               |
-| `vscode-code-notes.showLineBackground`    | Show colored background on commented lines                     | `boolean` | `true`                                                                                               |
-| `vscode-code-notes.categoryColors`        | Custom colors for each comment category                        | `object`  | `{"bug":"#f44336","question":"#2196f3","suggestion":"#4caf50","nitpick":"#ff9800","note":"#9e9e9e"}` |
-| `vscode-code-notes.aiTool`                | AI CLI tool to use for sending review comments                 | `string`  | `"claude"`                                                                                           |
-| `vscode-code-notes.aiToolCommand`         | Custom command path for AI tool (used when aiTool is 'custom') | `string`  | `""`                                                                                                 |
+| Key                                       | Description                                                                                                         | Type      | Default                                                                                              |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------- |
+| `vscode-code-notes.showInlineDecorations` | Show inline text decorations (after-line text preview)                                                              | `boolean` | `true`                                                                                               |
+| `vscode-code-notes.showGutterIcons`       | Show gutter icons for comments                                                                                      | `boolean` | `true`                                                                                               |
+| `vscode-code-notes.showLineBackground`    | Show colored background on commented lines                                                                          | `boolean` | `true`                                                                                               |
+| `vscode-code-notes.categoryColors`        | Custom colors for each comment category                                                                             | `object`  | `{"bug":"#f44336","question":"#2196f3","suggestion":"#4caf50","nitpick":"#ff9800","note":"#9e9e9e"}` |
+| `vscode-code-notes.aiTool`                | AI CLI tool to use for sending review comments                                                                      | `string`  | `"claude"`                                                                                           |
+| `vscode-code-notes.aiToolCommand`         | Custom command path for AI tool (used when aiTool is 'custom')                                                      | `string`  | `""`                                                                                                 |
+| `vscode-code-notes.promptTemplates`       | Named prompt templates for AI review. Use {{comments}} for formatted comments and {{files}} for affected file list. | `object`  | See package.json                                                                                     |
 
 <!-- configs -->
 

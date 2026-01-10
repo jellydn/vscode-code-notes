@@ -1,3 +1,15 @@
 # Ralph Progress Log
 Started: Sun Jan 11 02:28:40 +08 2026
 ---
+
+## Sun Jan 11 2026 - US-001
+Thread: https://ampcode.com/threads/T-019ba92a-f5be-70cc-a827-74679e8f64c9
+- Added `vscode-code-notes.aiTool` setting with enum: 'claude', 'opencode', 'custom' (default: 'claude')
+- Added `vscode-code-notes.aiToolCommand` setting for custom command path (string, default: '')
+- Ran `pnpm run update` to regenerate meta.ts
+- Typecheck and lint pass
+- Files changed: package.json, src/generated/meta.ts
+- **Learnings for future iterations:**
+  - Use `pnpm run update` after modifying package.json contributes.configuration to regenerate meta.ts
+  - vscode-ext-gen auto-generates typed settings access in meta.ts
+---

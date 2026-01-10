@@ -1,0 +1,154 @@
+{
+  "project": "Code Notes - AI Review",
+  "branchName": "ralph/ai-review",
+  "description": "Send review comments from .codereview/ to AI terminal tools (Claude Code or OpenCode) with plan mode for validation",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Add AI tool configuration settings",
+      "description": "As a developer, I want to configure which AI CLI tool to use so I can choose my preferred AI assistant.",
+      "acceptanceCriteria": [
+        "Add vscode-code-notes.aiTool setting with enum: 'claude', 'opencode', 'custom'",
+        "Add vscode-code-notes.aiToolCommand setting for custom command path (string)",
+        "Default aiTool to 'claude'",
+        "Run pnpm run update to regenerate meta.ts",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Add prompt template configuration",
+      "description": "As a developer, I want to define prompt templates so AI receives consistent review requests.",
+      "acceptanceCriteria": [
+        "Add vscode-code-notes.promptTemplates setting as object",
+        "Default template named 'review': 'Review these code review comments and validate the architectural decisions. Analyze and suggest improvements, do not implement.\\n\\n{{comments}}'",
+        "Templates support {{comments}} placeholder for formatted comments",
+        "Templates support {{files}} placeholder for affected file list",
+        "Run pnpm run update to regenerate meta.ts",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Create formatCommentsForAI helper function",
+      "description": "As a developer, I need a function to format comments into structured text for AI input.",
+      "acceptanceCriteria": [
+        "Create src/aiReview.ts with formatCommentsForAI(comments: Comment[]) function",
+        "Format each comment as: [category] file:startLine-endLine - text",
+        "Group comments by file path",
+        "Return object with { formattedComments: string, files: string[] }",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Create buildAICommand helper function",
+      "description": "As a developer, I need a function to build the correct CLI command for each AI tool.",
+      "acceptanceCriteria": [
+        "Add buildAICommand(tool: string, customCommand: string, prompt: string) to src/aiReview.ts",
+        "For claude: return 'claude -p --permission-mode plan \"prompt\"'",
+        "For opencode: return 'opencode run --agent plan \"prompt\"'",
+        "For custom: return customCommand with prompt appended",
+        "Escape double quotes in prompt",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Implement sendToAI command",
+      "description": "As a developer, I want to send all my review comments to AI for comprehensive validation.",
+      "acceptanceCriteria": [
+        "Add sendToAI command in src/commands.ts",
+        "Read aiTool and aiToolCommand from config",
+        "Get all comments from storage",
+        "Show error if no comments exist",
+        "Format comments using formatCommentsForAI",
+        "Apply default template with placeholders replaced",
+        "Create terminal with window.createTerminal()",
+        "Send command to terminal with terminal.sendText()",
+        "Show terminal with terminal.show()",
+        "Register command codeReview.sendToAI",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Add sendToAI command to package.json",
+      "description": "As a developer, I want the Send to AI command accessible from command palette and sidebar.",
+      "acceptanceCriteria": [
+        "Add codeReview.sendToAI command with title 'Send to AI Review' and icon $(sparkle)",
+        "Add to view/title menu for codeReviewComments view",
+        "Add keyboard shortcut Ctrl+Shift+A (Cmd+Shift+A on Mac)",
+        "Run pnpm run update to regenerate meta.ts",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Implement sendSelectedToAI command with QuickPick",
+      "description": "As a developer, I want to select specific comments and send only those to AI.",
+      "acceptanceCriteria": [
+        "Add sendSelectedToAI command in src/commands.ts",
+        "Show QuickPick with canPickMany: true",
+        "List all comments grouped by file (label: truncated text, description: file:line)",
+        "Filter selected comments and send to AI",
+        "Register command codeReview.sendSelectedToAI",
+        "Add command to package.json with title 'Send Selected to AI'",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Implement sendCategoryToAI command",
+      "description": "As a developer, I want to send comments filtered by category for focused review.",
+      "acceptanceCriteria": [
+        "Add sendCategoryToAI command in src/commands.ts",
+        "Show QuickPick to select category (bug, question, suggestion, nitpick, note)",
+        "Filter comments by selected category",
+        "Send filtered comments to AI",
+        "Register command codeReview.sendCategoryToAI",
+        "Add command to package.json with title 'Send Category to AI'",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Add prompt template picker to sendToAI",
+      "description": "As a developer, I want to choose which prompt template to use before sending.",
+      "acceptanceCriteria": [
+        "Show QuickPick with available templates from config before sending",
+        "Include 'Custom...' option that opens InputBox for one-time prompt",
+        "Apply selected template with {{comments}} and {{files}} replaced",
+        "Update sendToAI, sendSelectedToAI, sendCategoryToAI to use template picker",
+        "Typecheck passes"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

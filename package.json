@@ -216,24 +216,24 @@
     ],
     "configuration": {
       "type": "object",
-      "title": "code-notes",
+      "title": "Code Notes",
       "properties": {
-        "code-notes.showInlineDecorations": {
+        "vscode-code-notes.showInlineDecorations": {
           "type": "boolean",
           "default": true,
           "description": "Show inline text decorations (after-line text preview)"
         },
-        "code-notes.showGutterIcons": {
+        "vscode-code-notes.showGutterIcons": {
           "type": "boolean",
           "default": true,
           "description": "Show gutter icons for comments"
         },
-        "code-notes.showLineBackground": {
+        "vscode-code-notes.showLineBackground": {
           "type": "boolean",
           "default": true,
           "description": "Show colored background on commented lines"
         },
-        "code-notes.categoryColors": {
+        "vscode-code-notes.categoryColors": {
           "type": "object",
           "default": {
             "bug": "#f44336",

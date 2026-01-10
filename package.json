@@ -2,7 +2,7 @@
   "publisher": "jellydn",
   "name": "code-notes",
   "displayName": "code-notes",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@10.27.0",
   "description": "",

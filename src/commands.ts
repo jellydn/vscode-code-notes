@@ -1,7 +1,9 @@
 import type { Comment, CommentCategory } from './types'
 import * as path from 'node:path'
 import { commands, Position, Range, Selection, Uri, window, workspace } from 'vscode'
+import { buildAICommand, formatCommentsForAI } from './aiReview'
 import { getStorage, refreshAllDecorations } from './decorations'
+import { configs } from './generated/meta'
 import { getCodeReviewDir } from './storage'
 import { getTreeDataProvider, refreshTreeView } from './treeView'
 
@@ -649,6 +651,40 @@ export async function exportHtml(): Promise<void> {
   window.showInformationMessage(`Exported ${comments.length} comments to review-report.html`)
 }
 
+export async function sendToAI(): Promise<void> {
+  if (!await ensureInitialized()) {
+    return
+  }
+
+  const storage = getStorage()
+  const comments = storage.getAll()
+
+  if (comments.length === 0) {
+    window.showErrorMessage('No comments to send to AI')
+    return
+  }
+
+  const config = workspace.getConfiguration()
+  const aiTool = config.get<string>(configs.aiTool.key, configs.aiTool.default)
+  const aiToolCommand = config.get<string>(configs.aiToolCommand.key, configs.aiToolCommand.default)
+  const promptTemplates = config.get<Record<string, string>>(configs.promptTemplates.key, configs.promptTemplates.default as Record<string, string>)
+
+  const { formattedComments, files } = formatCommentsForAI(comments)
+
+  const template = promptTemplates.review || configs.promptTemplates.default.review as string
+  const prompt = template
+    .replace(/\{\{comments\}\}/g, formattedComments)
+    .replace(/\{\{files\}\}/g, files.join('\n'))
+
+  const command = buildAICommand(aiTool, aiToolCommand, prompt)
+
+  const terminal = window.createTerminal('AI Review')
+  terminal.sendText(command)
+  terminal.show()
+
+  window.showInformationMessage(`Sent ${comments.length} comments to AI review`)
+}
+
 export function registerCommands(): void {
   commands.registerCommand('codeReview.addComment', addComment)
   commands.registerCommand('codeReview.navigateToComment', navigateToComment)
@@ -662,4 +698,5 @@ export function registerCommands(): void {
   commands.registerCommand('codeReview.exportMarkdown', exportMarkdown)
   commands.registerCommand('codeReview.exportHtml', exportHtml)
   commands.registerCommand('codeReview.clearAll', clearAll)
+  commands.registerCommand('codeReview.sendToAI', sendToAI)
 }

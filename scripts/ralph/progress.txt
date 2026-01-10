@@ -38,3 +38,18 @@ Thread: https://ampcode.com/threads/T-019ba92e-8145-7132-a52b-0de509c32dbf
   - The Comment type is defined in src/types.ts with filePath, startLine, endLine, text, category fields
   - When formatting line ranges, use single line number if startLine === endLine
 ---
+
+## Sun Jan 11 2026 - US-004
+Thread: https://ampcode.com/threads/T-019ba92f-efc0-73ce-8bb9-b11b0fca2494
+- Added buildAICommand(tool, customCommand, prompt) function to src/aiReview.ts
+- Handles 'claude', 'opencode', and 'custom' tool types
+- Escapes double quotes in prompts to prevent command injection
+- Claude uses: `claude -p --permission-mode plan "prompt"`
+- OpenCode uses: `opencode run --agent plan "prompt"`
+- Custom appends quoted prompt to custom command
+- Typecheck and lint pass
+- Files changed: src/aiReview.ts
+- **Learnings for future iterations:**
+  - Double quotes in prompts must be escaped for shell commands
+  - Use switch statement with default fallback for tool selection
+---

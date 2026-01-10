@@ -53,3 +53,20 @@ Thread: https://ampcode.com/threads/T-019ba92f-efc0-73ce-8bb9-b11b0fca2494
   - Double quotes in prompts must be escaped for shell commands
   - Use switch statement with default fallback for tool selection
 ---
+
+## Sun Jan 11 2026 - US-005
+Thread: https://ampcode.com/threads/T-019ba931-78b4-77ae-8637-ee371abf7369
+- Implemented sendToAI command in src/commands.ts
+- Reads aiTool, aiToolCommand, and promptTemplates from config using configs from meta.ts
+- Gets all comments from storage, shows error if none exist
+- Formats comments using formatCommentsForAI from aiReview.ts
+- Applies default 'review' template with {{comments}} and {{files}} placeholders replaced
+- Creates terminal with window.createTerminal('AI Review')
+- Sends command to terminal with terminal.sendText() and shows with terminal.show()
+- Registered command as codeReview.sendToAI
+- Typecheck and lint pass
+- Files changed: src/commands.ts
+- **Learnings for future iterations:**
+  - Use workspace.getConfiguration().get() with configs.X.key and configs.X.default for type-safe config access
+  - Terminal commands can be executed via window.createTerminal() and terminal.sendText()
+---

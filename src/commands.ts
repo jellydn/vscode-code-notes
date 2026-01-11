@@ -615,7 +615,7 @@ export async function exportHtml(): Promise<void> {
     '  </style>',
     '</head>',
     '<body>',
-    '  <h1>📋 Code Review Report</h1>',
+    `  <h1>📋 ${displayName} Report</h1>`,
     `  <div class="summary">`,
     `    <p><strong>Generated:</strong> ${escapeHtml(new Date().toLocaleString())}</p>`,
     `    <p><strong>Total comments:</strong> ${comments.length}</p>`,

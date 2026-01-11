@@ -140,16 +140,16 @@ export async function updateDecorations(editor: TextEditor): Promise<void> {
     )
     const hoverMessage = createHoverMessage(comment)
 
-    gutterDecorationsByCategory.get(category)!.push({
+    gutterDecorationsByCategory.get(category)?.push({
       range,
       hoverMessage,
     })
 
-    backgroundDecorationsByCategory.get(category)!.push({
+    backgroundDecorationsByCategory.get(category)?.push({
       range,
     })
 
-    inlineDecorationsByCategory.get(category)!.push({
+    inlineDecorationsByCategory.get(category)?.push({
       range,
       renderOptions: {
         after: {

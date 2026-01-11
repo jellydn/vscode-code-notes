@@ -149,6 +149,11 @@ export async function updateDecorations(editor: TextEditor): Promise<void> {
 
   for (const comment of comments) {
     const category = comment.category
+
+    if (!isCategoryVisible(category)) {
+      continue
+    }
+
     if (!gutterDecorationsByCategory.has(category)) {
       gutterDecorationsByCategory.set(category, [])
       backgroundDecorationsByCategory.set(category, [])

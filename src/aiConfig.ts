@@ -25,7 +25,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolType, AiToolConfig> = {
     requiresCustomCommand: false,
   },
   [AI_TOOLS.OPENCODE]: {
-    command: 'opencode run --model {{model}} "{{prompt}}"',
+    command: 'opencode run --model {{model}} --agent plan "{{prompt}}"',
     requiresModel: true,
     defaultModel: 'opencode/big-pickle',
     securityWarning: false,

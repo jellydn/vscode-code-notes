@@ -40,6 +40,16 @@
       <p>Export your review comments to <strong>Markdown</strong> or <strong>HTML</strong> for sharing or documentation.</p>
     </td>
   </tr>
+  <tr>
+    <td width="50%">
+      <h3>🤖 AI Review Integration</h3>
+      <p>Send comments to AI terminal tools (<strong>OpenCode</strong> or <strong>Claude</strong>) for architectural validation and code review feedback.</p>
+    </td>
+    <td width="50%">
+      <h3>📝 Prompt Templates</h3>
+      <p>Use customizable prompt templates (review, security, refactor) with <code>{{comments}}</code> and <code>{{files}}</code> placeholders.</p>
+    </td>
+  </tr>
 </table>
 
 ## 🚀 Quick Start
@@ -70,6 +80,12 @@
 - Open the view menu in the Code Review panel
 - Choose **Export to Markdown** or **Export to HTML**
 
+### AI Review
+- **Send All**: Click the ✨ button in the Code Review panel or press <kbd>Cmd/Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd>
+- **Send Selected**: Run **Code Review: Send Selected to AI** to pick specific comments
+- **Send by Category**: Run **Code Review: Send Category to AI** to filter by category first
+- Choose a prompt template (review, security, refactor) or enter a custom prompt
+
 ## ⚙️ Configuration
 
 <!-- configs -->
@@ -80,8 +96,8 @@
 | `vscode-code-notes.showGutterIcons`       | Show gutter icons for comments                                                                                      | `boolean` | `true`                                                                                               |
 | `vscode-code-notes.showLineBackground`    | Show colored background on commented lines                                                                          | `boolean` | `true`                                                                                               |
 | `vscode-code-notes.categoryColors`        | Custom colors for each comment category                                                                             | `object`  | `{"bug":"#f44336","question":"#2196f3","suggestion":"#4caf50","nitpick":"#ff9800","note":"#9e9e9e"}` |
-| `vscode-code-notes.aiTool`                | AI CLI tool to use for sending review comments                                                                      | `string`  | `"claude"`                                                                                           |
-| `vscode-code-notes.aiToolCommand`         | Custom command path for AI tool (used when aiTool is 'custom')                                                      | `string`  | `""`                                                                                                 |
+| `vscode-code-notes.aiTool`                | AI CLI tool to use for sending review comments                                                                      | `string`  | `"opencode"`                                                                                         |
+| `vscode-code-notes.aiToolCommand`         | Custom command path for AI tool (used when aiTool is 'custom', e.g., 'ccs glm')                                     | `string`  | `""`                                                                                                 |
 | `vscode-code-notes.promptTemplates`       | Named prompt templates for AI review. Use {{comments}} for formatted comments and {{files}} for affected file list. | `object`  | See package.json                                                                                     |
 
 <!-- configs -->

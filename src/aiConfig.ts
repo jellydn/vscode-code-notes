@@ -58,7 +58,7 @@ export function getToolConfig(tool: AiToolType): AiToolConfig {
 export function isToolConfigValid(tool: AiToolType, customCommand: string): boolean {
   const config = getToolConfig(tool)
 
-  if (config.requiresCustomCommand && !customCommand) {
+  if (config.requiresCustomCommand && !customCommand?.trim()) {
     return false
   }
 

@@ -27,7 +27,7 @@ Code reviews are essential for maintaining code quality, but traditional review 
 - **Manual follow-up**: No easy way to validate architectural decisions with AI
 
 **SealCode** brings code review directly into VS Code, letting you annotate code in context and leverage AI tools to validate your review comments—turning observations into actionable insights.
-
+[![Screenshot](https://i.gyazo.com/5e87ad6f041a627b2df8bb36103ccde9.png)](https://gyazo.com/5e87ad6f041a627b2df8bb36103ccde9)
 ## ✨ Features
 
 <table>
@@ -101,6 +101,7 @@ Code reviews are essential for maintaining code quality, but traditional review 
 ### 🤖 AI Review
 
 SealCode integrates with popular AI coding tools to analyze your review comments:
+[![send to Opencode](https://i.gyazo.com/fdb9d2a2663f48f1b502934dbdc98c81.gif)](https://gyazo.com/fdb9d2a2663f48f1b502934dbdc98c81)
 
 | Tool | Description | Model Configuration |
 |------|-------------|---------------------|
@@ -141,7 +142,6 @@ Choose from built-in templates or create your own:
 | `seal-code.aiToolAmpModel`        | Amp mode to use (rush or smart). Execute mode requires rush or smart.                                               | `string`  | `"smart"`                                                                                            |
 | `seal-code.promptTemplates`       | Named prompt templates for AI review. Use {{comments}} for formatted comments and {{files}} for affected file list. | `object`  | See package.json                                                                                     |
 | `seal-code.showAIQuickPick`       | Show quick pick menu for AI tool selection before sending to AI                                                     | `boolean` | `false`                                                                                              |
-| `seal-code.aiReviewKeybinding`    | Keybinding for Send to AI Review command                                                                            | `string`  | `"cmd+option+shift+a"`                                                                               |
 
 <!-- configs -->
 

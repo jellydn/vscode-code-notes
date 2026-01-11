@@ -1,3 +1,4 @@
+import type { Terminal } from 'vscode'
 import type { Comment, CommentCategory } from './types'
 import * as path from 'node:path'
 import { commands, Position, Range, Selection, Uri, window, workspace } from 'vscode'
@@ -29,6 +30,28 @@ function generateTerminalName(promptTemplateName?: string, aiTool?: string): str
     parts.push(`(${aiTool})`)
   }
   return parts.join(' - ')
+}
+
+const TERMINAL_READY_TIMEOUT_MS = 3000
+
+async function sendCommandToTerminal(terminal: Terminal, command: string): Promise<void> {
+  return new Promise((resolve) => {
+    const disposable = window.onDidChangeTerminalShellIntegration(({ terminal: activatedTerminal, shellIntegration }) => {
+      if (activatedTerminal === terminal) {
+        disposable.dispose()
+        shellIntegration.executeCommand(command)
+        resolve()
+      }
+    })
+
+    setTimeout(() => {
+      disposable.dispose()
+      if (!terminal.shellIntegration) {
+        terminal.sendText(command)
+      }
+      resolve()
+    }, TERMINAL_READY_TIMEOUT_MS)
+  })
 }
 
 function extractComment(arg: Comment | CommentItemLike): Comment {
@@ -780,8 +803,9 @@ async function executeAIReview(comments: Comment[], context: string = ''): Promi
 
   const terminalName = generateTerminalName(templateName, aiTool)
   const terminal = window.createTerminal(terminalName)
-  terminal.sendText(command)
   terminal.show()
+
+  await sendCommandToTerminal(terminal, command)
 
   showCommentsSentMessage(comments.length, context)
 }

@@ -4,6 +4,14 @@ import { commands, Position, Range, Selection, Uri, window, workspace } from 'vs
 import { buildAICommand, formatCommentsForAI } from './aiReview'
 import { getStorage, refreshAllDecorations } from './decorations'
 import { configs } from './generated/meta'
+import {
+  showCommentAddedMessage,
+  showCommentDeletedMessage,
+  showCommentsClearedMessage,
+  showCommentsExportedMessage,
+  showCommentsSentMessage,
+  showCommentUpdatedMessage,
+} from './messages'
 import { getCodeReviewDir } from './storage'
 import { getTreeDataProvider, refreshTreeView } from './treeView'
 
@@ -83,7 +91,7 @@ export async function addComment(): Promise<void> {
   await refreshAllDecorations()
   refreshTreeView()
 
-  window.showInformationMessage(`Comment added at line ${startLine === endLine ? startLine : `${startLine}-${endLine}`}`)
+  showCommentAddedMessage(filePath, startLine, endLine)
 }
 
 export async function navigateToComment(comment: Comment): Promise<void> {
@@ -111,10 +119,8 @@ export async function editCommentById(arg: { id: string }): Promise<void> {
     return
   }
 
-  const storage = getStorage()
-  const existingComment = storage.getById(arg.id)
+  const existingComment = await findCommentById(arg.id)
   if (!existingComment) {
-    window.showErrorMessage('Comment not found')
     return
   }
 
@@ -146,7 +152,7 @@ async function editCommentInternal(existingComment: Comment): Promise<void> {
   await refreshAllDecorations()
   refreshTreeView()
 
-  window.showInformationMessage('Comment updated')
+  showCommentUpdatedMessage(existingComment)
 }
 
 export async function editComment(arg: Comment | CommentItemLike): Promise<void> {
@@ -155,10 +161,8 @@ export async function editComment(arg: Comment | CommentItemLike): Promise<void>
   }
 
   const comment = extractComment(arg)
-  const storage = getStorage()
-  const existingComment = storage.getById(comment.id)
+  const existingComment = await findCommentById(comment.id)
   if (!existingComment) {
-    window.showErrorMessage('Comment not found')
     return
   }
 
@@ -181,7 +185,17 @@ async function deleteCommentInternal(existingComment: Comment): Promise<void> {
   await refreshAllDecorations()
   refreshTreeView()
 
-  window.showInformationMessage('Comment deleted')
+  showCommentDeletedMessage(existingComment)
+}
+
+async function findCommentById(id: string): Promise<Comment | null> {
+  const storage = getStorage()
+  const comment = storage.getById(id)
+  if (!comment) {
+    window.showErrorMessage('Comment not found')
+    return null
+  }
+  return comment
 }
 
 export async function deleteCommentById(arg: { id: string }): Promise<void> {
@@ -189,10 +203,8 @@ export async function deleteCommentById(arg: { id: string }): Promise<void> {
     return
   }
 
-  const storage = getStorage()
-  const existingComment = storage.getById(arg.id)
+  const existingComment = await findCommentById(arg.id)
   if (!existingComment) {
-    window.showErrorMessage('Comment not found')
     return
   }
 
@@ -205,10 +217,8 @@ export async function deleteComment(arg: Comment | CommentItemLike): Promise<voi
   }
 
   const comment = extractComment(arg)
-  const storage = getStorage()
-  const existingComment = storage.getById(comment.id)
+  const existingComment = await findCommentById(comment.id)
   if (!existingComment) {
-    window.showErrorMessage('Comment not found')
     return
   }
 
@@ -511,7 +521,7 @@ export async function exportMarkdown(): Promise<void> {
 
   const doc = await workspace.openTextDocument(outputPath)
   await window.showTextDocument(doc)
-  window.showInformationMessage(`Exported ${comments.length} comments to review-report.md`)
+  showCommentsExportedMessage(comments.length, 'md')
 }
 
 export async function clearAll(): Promise<void> {
@@ -542,7 +552,7 @@ export async function clearAll(): Promise<void> {
   await refreshAllDecorations()
   refreshTreeView()
 
-  window.showInformationMessage(`Cleared ${count} comments`)
+  showCommentsClearedMessage(count)
 }
 
 export async function exportHtml(): Promise<void> {
@@ -648,7 +658,7 @@ export async function exportHtml(): Promise<void> {
 
   const doc = await workspace.openTextDocument(outputPath)
   await window.showTextDocument(doc)
-  window.showInformationMessage(`Exported ${comments.length} comments to review-report.html`)
+  showCommentsExportedMessage(comments.length, 'html')
 }
 
 async function pickPromptTemplate(formattedComments: string, files: string[]): Promise<string | undefined> {
@@ -721,7 +731,7 @@ export async function sendToAI(): Promise<void> {
   terminal.sendText(command)
   terminal.show()
 
-  window.showInformationMessage(`Sent ${comments.length} comments to AI review`)
+  showCommentsSentMessage(comments.length)
 }
 
 export async function sendSelectedToAI(): Promise<void> {
@@ -788,7 +798,7 @@ export async function sendSelectedToAI(): Promise<void> {
   terminal.sendText(command)
   terminal.show()
 
-  window.showInformationMessage(`Sent ${selectedComments.length} comments to AI review`)
+  showCommentsSentMessage(selectedComments.length, 'selected')
 }
 
 export async function sendCategoryToAI(): Promise<void> {
@@ -845,7 +855,7 @@ export async function sendCategoryToAI(): Promise<void> {
   terminal.sendText(command)
   terminal.show()
 
-  window.showInformationMessage(`Sent ${filteredComments.length} ${selectedCategory.value} comments to AI review`)
+  showCommentsSentMessage(filteredComments.length, `${selectedCategory.value}`)
 }
 
 export function registerCommands(): void {

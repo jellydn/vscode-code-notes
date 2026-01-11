@@ -1,7 +1,7 @@
 {
   "publisher": "jellydn",
-  "name": "vscode-code-notes",
-  "displayName": "Code Notes - Review Comments",
+  "name": "seal-code",
+  "displayName": "SealCode - Smart Code Review",
   "version": "0.2.1",
   "private": true,
   "packageManager": "pnpm@10.28.0",
@@ -244,24 +244,24 @@
     ],
     "configuration": {
       "type": "object",
-      "title": "Code Notes",
+      "title": "SealCode",
       "properties": {
-        "vscode-code-notes.showInlineDecorations": {
+        "seal-code.showInlineDecorations": {
           "type": "boolean",
           "default": true,
           "description": "Show inline text decorations (after-line text preview)"
         },
-        "vscode-code-notes.showGutterIcons": {
+        "seal-code.showGutterIcons": {
           "type": "boolean",
           "default": true,
           "description": "Show gutter icons for comments"
         },
-        "vscode-code-notes.showLineBackground": {
+        "seal-code.showLineBackground": {
           "type": "boolean",
           "default": true,
           "description": "Show colored background on commented lines"
         },
-        "vscode-code-notes.categoryColors": {
+        "seal-code.categoryColors": {
           "type": "object",
           "default": {
             "bug": "#f44336",
@@ -279,39 +279,39 @@
             "note": { "type": "string", "description": "Color for Note category" }
           }
         },
-        "vscode-code-notes.aiTool": {
+        "seal-code.aiTool": {
           "type": "string",
           "enum": ["claude", "copilot", "opencode", "amp", "custom"],
           "default": "opencode",
           "description": "AI CLI tool to use for sending review comments"
         },
-        "vscode-code-notes.aiToolCommand": {
+        "seal-code.aiToolCommand": {
           "type": "string",
           "default": "",
           "description": "Custom command path for AI tool (used when aiTool is 'custom', e.g., 'ccs glm')"
         },
-        "vscode-code-notes.aiToolClaudeModel": {
+        "seal-code.aiToolClaudeModel": {
           "type": "string",
           "default": "haiku",
           "description": "Claude model to use (e.g., haiku, sonnet, opus)"
         },
-        "vscode-code-notes.aiToolOpenCodeModel": {
+        "seal-code.aiToolOpenCodeModel": {
           "type": "string",
           "default": "opencode/big-pickle",
           "description": "OpenCode model to use (e.g., opencode/big-pickle, opencode/claude)"
         },
-        "vscode-code-notes.aiToolCopilotModel": {
+        "seal-code.aiToolCopilotModel": {
           "type": "string",
           "default": "gpt-4.1",
           "description": "Copilot model to use (e.g., gpt-4.1, gpt-4o, o3)"
         },
-        "vscode-code-notes.aiToolAmpModel": {
+        "seal-code.aiToolAmpModel": {
           "type": "string",
           "enum": ["rush", "smart"],
           "default": "smart",
           "description": "Amp mode to use (rush or smart). Execute mode requires rush or smart."
         },
-        "vscode-code-notes.promptTemplates": {
+        "seal-code.promptTemplates": {
           "type": "object",
           "default": {
             "review": "Review these code review comments and validate the architectural decisions. Analyze and suggest improvements, do not implement.\n\n{{comments}}",
@@ -325,7 +325,7 @@
             "description": "Prompt template text. Supports {{comments}} and {{files}} placeholders."
           }
         },
-        "vscode-code-notes.showAIQuickPick": {
+        "seal-code.showAIQuickPick": {
           "type": "boolean",
           "default": false,
           "description": "Show quick pick menu for AI tool selection before sending to AI"

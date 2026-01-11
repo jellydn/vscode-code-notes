@@ -84,7 +84,7 @@
 - **Send All**: Click the ✨ button in the Code Review panel or press <kbd>Cmd/Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd>
 - **Send Selected**: Run **Code Review: Send Selected to AI** to pick specific comments
 - **Send by Category**: Run **Code Review: Send Category to AI** to filter by category first
-- Choose a prompt template (review, security, refactor) or enter a custom prompt
+- Choose a prompt template (review, security, refactor, simplify) or enter a custom prompt
 
 ## ⚙️ Configuration
 

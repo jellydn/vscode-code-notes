@@ -295,7 +295,8 @@
           "default": {
             "review": "Review these code review comments and validate the architectural decisions. Analyze and suggest improvements, do not implement.\n\n{{comments}}",
             "security": "Analyze these code review comments for security concerns. Identify potential vulnerabilities and suggest mitigations.\n\n{{comments}}",
-            "refactor": "Review these comments and suggest refactoring opportunities to improve code quality, maintainability, and performance.\n\n{{comments}}"
+            "refactor": "Review these comments and suggest refactoring opportunities to improve code quality, maintainability, and performance.\n\n{{comments}}",
+            "simplify": "Review these comments and suggest ways to simplify the code. Focus on reducing complexity, removing unnecessary abstractions, and making the code easier to understand.\n\n{{comments}}"
           },
           "description": "Named prompt templates for AI review. Use {{comments}} for formatted comments and {{files}} for affected file list.",
           "additionalProperties": {

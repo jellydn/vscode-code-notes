@@ -1,0 +1,63 @@
+{
+  "project": "vscode-code-notes",
+  "branchName": "ralph/amp-cli-support",
+  "description": "Add Amp CLI support to Send Review Comments to AI feature",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Add Amp CLI as AI tool option",
+      "description": "As a developer, I want to use Amp CLI to review my code comments so I can leverage Amp's AI capabilities.",
+      "acceptanceCriteria": [
+        "Add 'amp' to AI_TOOLS constant in aiTools.ts",
+        "Update AiToolType to include 'amp'",
+        "Add amp case to getAiToolDefaultModel returning 'free'",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Configure Amp CLI command builder",
+      "description": "As a developer, I need the extension to correctly build Amp CLI commands with proper flags.",
+      "acceptanceCriteria": [
+        "Add Amp config to AI_TOOL_CONFIGS in aiConfig.ts",
+        "Command format: amp -x \"{{prompt}}\" --mode {{model}} --dangerously-allow-all",
+        "Set requiresModel: true, defaultModel: 'free'",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Add Amp to AI tool quick pick",
+      "description": "As a user, I want to see Amp in the AI tool selection dropdown.",
+      "acceptanceCriteria": [
+        "Add Amp option to aiToolOptions array in commands.ts",
+        "Include label 'Amp' with value AI_TOOLS.AMP",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": true,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Add Amp model configuration setting",
+      "description": "As a user, I want to configure the Amp mode in VSCode settings.",
+      "acceptanceCriteria": [
+        "Add 'amp' to aiTool enum in package.json",
+        "Add codeNotes.aiTool.ampModel setting with enum: rush, smart (default: smart)",
+        "Run nr update to regenerate metadata",
+        "Update aiReview.ts to read Amp model config in buildAICommand switch",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": true,
+      "notes": ""
+    }
+  ]
+}

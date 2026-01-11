@@ -1,7 +1,7 @@
 {
   "publisher": "jellydn",
-  "name": "vscode-code-notes",
-  "displayName": "Code Notes - Review Comments",
+  "name": "seal-code",
+  "displayName": "SealCode - Smart Code Review",
   "version": "0.2.1",
   "private": true,
   "packageManager": "pnpm@10.28.0",
@@ -101,6 +101,24 @@
         "command": "codeReview.deleteCommentById",
         "title": "Delete Comment",
         "category": "Code Review"
+      },
+      {
+        "command": "codeReview.sendToAI",
+        "title": "Send to AI Review",
+        "category": "Code Review",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "codeReview.sendSelectedToAI",
+        "title": "Send Selected to AI",
+        "category": "Code Review",
+        "icon": "$(checklist)"
+      },
+      {
+        "command": "codeReview.sendCategoryToAI",
+        "title": "Send Category to AI",
+        "category": "Code Review",
+        "icon": "$(tag)"
       }
     ],
     "viewsContainers": {
@@ -197,6 +215,11 @@
           "command": "codeReview.clearAll",
           "when": "view == codeReviewComments",
           "group": "danger"
+        },
+        {
+          "command": "codeReview.sendToAI",
+          "when": "view == codeReviewComments",
+          "group": "navigation@3"
         }
       ]
     },
@@ -212,28 +235,33 @@
         "key": "delete",
         "mac": "backspace",
         "when": "focusedView == codeReviewComments && viewItem == comment"
+      },
+      {
+        "command": "codeReview.sendToAI",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a"
       }
     ],
     "configuration": {
       "type": "object",
-      "title": "Code Notes",
+      "title": "SealCode",
       "properties": {
-        "vscode-code-notes.showInlineDecorations": {
+        "seal-code.showInlineDecorations": {
           "type": "boolean",
           "default": true,
           "description": "Show inline text decorations (after-line text preview)"
         },
-        "vscode-code-notes.showGutterIcons": {
+        "seal-code.showGutterIcons": {
           "type": "boolean",
           "default": true,
           "description": "Show gutter icons for comments"
         },
-        "vscode-code-notes.showLineBackground": {
+        "seal-code.showLineBackground": {
           "type": "boolean",
           "default": true,
           "description": "Show colored background on commented lines"
         },
-        "vscode-code-notes.categoryColors": {
+        "seal-code.categoryColors": {
           "type": "object",
           "default": {
             "bug": "#f44336",
@@ -250,6 +278,57 @@
             "nitpick": { "type": "string", "description": "Color for Nitpick category" },
             "note": { "type": "string", "description": "Color for Note category" }
           }
+        },
+        "seal-code.aiTool": {
+          "type": "string",
+          "enum": ["claude", "copilot", "opencode", "amp", "custom"],
+          "default": "opencode",
+          "description": "AI CLI tool to use for sending review comments"
+        },
+        "seal-code.aiToolCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Custom command path for AI tool (used when aiTool is 'custom', e.g., 'ccs glm')"
+        },
+        "seal-code.aiToolClaudeModel": {
+          "type": "string",
+          "default": "haiku",
+          "description": "Claude model to use (e.g., haiku, sonnet, opus)"
+        },
+        "seal-code.aiToolOpenCodeModel": {
+          "type": "string",
+          "default": "opencode/big-pickle",
+          "description": "OpenCode model to use (e.g., opencode/big-pickle, opencode/claude)"
+        },
+        "seal-code.aiToolCopilotModel": {
+          "type": "string",
+          "default": "gpt-4.1",
+          "description": "Copilot model to use (e.g., gpt-4.1, gpt-4o, o3)"
+        },
+        "seal-code.aiToolAmpModel": {
+          "type": "string",
+          "enum": ["rush", "smart"],
+          "default": "smart",
+          "description": "Amp mode to use (rush or smart). Execute mode requires rush or smart."
+        },
+        "seal-code.promptTemplates": {
+          "type": "object",
+          "default": {
+            "review": "Review these code review comments and validate the architectural decisions. Analyze and suggest improvements, do not implement.\n\n{{comments}}",
+            "security": "Analyze these code review comments for security concerns. Identify potential vulnerabilities and suggest mitigations.\n\n{{comments}}",
+            "refactor": "Review these comments and suggest refactoring opportunities to improve code quality, maintainability, and performance.\n\n{{comments}}",
+            "simplify": "Review these comments and suggest ways to simplify the code. Focus on reducing complexity, removing unnecessary abstractions, and making the code easier to understand.\n\n{{comments}}"
+          },
+          "description": "Named prompt templates for AI review. Use {{comments}} for formatted comments and {{files}} for affected file list.",
+          "additionalProperties": {
+            "type": "string",
+            "description": "Prompt template text. Supports {{comments}} and {{files}} placeholders."
+          }
+        },
+        "seal-code.showAIQuickPick": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show quick pick menu for AI tool selection before sending to AI"
         }
       }
     }

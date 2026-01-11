@@ -1,12 +1,34 @@
 import type { Comment, CommentCategory } from './types'
 import * as path from 'node:path'
 import { commands, Position, Range, Selection, Uri, window, workspace } from 'vscode'
+import { buildAICommand, formatCommentsForAI } from './aiReview'
+import { AI_TOOLS } from './aiTools'
 import { getStorage, refreshAllDecorations } from './decorations'
+import { configs, displayName } from './generated/meta'
+import {
+  showCommentAddedMessage,
+  showCommentDeletedMessage,
+  showCommentsClearedMessage,
+  showCommentsExportedMessage,
+  showCommentsSentMessage,
+  showCommentUpdatedMessage,
+} from './messages'
 import { getCodeReviewDir } from './storage'
 import { getTreeDataProvider, refreshTreeView } from './treeView'
 
 interface CommentItemLike {
   comment: Comment
+}
+
+function generateTerminalName(promptTemplateName?: string, aiTool?: string): string {
+  const parts = [displayName]
+  if (promptTemplateName) {
+    parts.push(promptTemplateName)
+  }
+  if (aiTool) {
+    parts.push(`(${aiTool})`)
+  }
+  return parts.join(' - ')
 }
 
 function extractComment(arg: Comment | CommentItemLike): Comment {
@@ -81,7 +103,7 @@ export async function addComment(): Promise<void> {
   await refreshAllDecorations()
   refreshTreeView()
 
-  window.showInformationMessage(`Comment added at line ${startLine === endLine ? startLine : `${startLine}-${endLine}`}`)
+  showCommentAddedMessage(filePath, startLine, endLine)
 }
 
 export async function navigateToComment(comment: Comment): Promise<void> {
@@ -109,10 +131,8 @@ export async function editCommentById(arg: { id: string }): Promise<void> {
     return
   }
 
-  const storage = getStorage()
-  const existingComment = storage.getById(arg.id)
+  const existingComment = await findCommentById(arg.id)
   if (!existingComment) {
-    window.showErrorMessage('Comment not found')
     return
   }
 
@@ -144,7 +164,7 @@ async function editCommentInternal(existingComment: Comment): Promise<void> {
   await refreshAllDecorations()
   refreshTreeView()
 
-  window.showInformationMessage('Comment updated')
+  showCommentUpdatedMessage(existingComment)
 }
 
 export async function editComment(arg: Comment | CommentItemLike): Promise<void> {
@@ -153,10 +173,8 @@ export async function editComment(arg: Comment | CommentItemLike): Promise<void>
   }
 
   const comment = extractComment(arg)
-  const storage = getStorage()
-  const existingComment = storage.getById(comment.id)
+  const existingComment = await findCommentById(comment.id)
   if (!existingComment) {
-    window.showErrorMessage('Comment not found')
     return
   }
 
@@ -179,7 +197,17 @@ async function deleteCommentInternal(existingComment: Comment): Promise<void> {
   await refreshAllDecorations()
   refreshTreeView()
 
-  window.showInformationMessage('Comment deleted')
+  showCommentDeletedMessage(existingComment)
+}
+
+async function findCommentById(id: string): Promise<Comment | null> {
+  const storage = getStorage()
+  const comment = storage.getById(id)
+  if (!comment) {
+    window.showErrorMessage('Comment not found')
+    return null
+  }
+  return comment
 }
 
 export async function deleteCommentById(arg: { id: string }): Promise<void> {
@@ -187,10 +215,8 @@ export async function deleteCommentById(arg: { id: string }): Promise<void> {
     return
   }
 
-  const storage = getStorage()
-  const existingComment = storage.getById(arg.id)
+  const existingComment = await findCommentById(arg.id)
   if (!existingComment) {
-    window.showErrorMessage('Comment not found')
     return
   }
 
@@ -203,10 +229,8 @@ export async function deleteComment(arg: Comment | CommentItemLike): Promise<voi
   }
 
   const comment = extractComment(arg)
-  const storage = getStorage()
-  const existingComment = storage.getById(comment.id)
+  const existingComment = await findCommentById(comment.id)
   if (!existingComment) {
-    window.showErrorMessage('Comment not found')
     return
   }
 
@@ -509,7 +533,7 @@ export async function exportMarkdown(): Promise<void> {
 
   const doc = await workspace.openTextDocument(outputPath)
   await window.showTextDocument(doc)
-  window.showInformationMessage(`Exported ${comments.length} comments to review-report.md`)
+  showCommentsExportedMessage(comments.length, 'md')
 }
 
 export async function clearAll(): Promise<void> {
@@ -540,7 +564,7 @@ export async function clearAll(): Promise<void> {
   await refreshAllDecorations()
   refreshTreeView()
 
-  window.showInformationMessage(`Cleared ${count} comments`)
+  showCommentsClearedMessage(count)
 }
 
 export async function exportHtml(): Promise<void> {
@@ -646,7 +670,200 @@ export async function exportHtml(): Promise<void> {
 
   const doc = await workspace.openTextDocument(outputPath)
   await window.showTextDocument(doc)
-  window.showInformationMessage(`Exported ${comments.length} comments to review-report.html`)
+  showCommentsExportedMessage(comments.length, 'html')
+}
+
+async function pickPromptTemplate(formattedComments: string, files: string[]): Promise<{ prompt: string, templateName: string } | undefined> {
+  const config = workspace.getConfiguration()
+  const promptTemplates = config.get<Record<string, string>>(configs.promptTemplates.key, configs.promptTemplates.default as Record<string, string>)
+
+  const templateNames = Object.keys(promptTemplates)
+  const quickPickItems: { label: string, value: string | null }[] = templateNames.map(name => ({
+    label: name,
+    value: promptTemplates[name],
+  }))
+  quickPickItems.push({ label: '$(edit) Custom...', value: null })
+
+  const selected = await window.showQuickPick(quickPickItems, {
+    placeHolder: 'Select a prompt template',
+    title: 'Prompt Template',
+  })
+
+  if (!selected) {
+    return undefined
+  }
+
+  let template: string
+  let templateName: string
+
+  if (selected.value === null) {
+    const customPrompt = await window.showInputBox({
+      prompt: 'Enter custom prompt (use {{comments}} and {{files}} as placeholders)',
+      placeHolder: 'Review these comments: {{comments}}',
+    })
+    if (!customPrompt) {
+      return undefined
+    }
+    template = customPrompt
+    templateName = 'Custom'
+  }
+  else {
+    template = selected.value
+    templateName = selected.label
+  }
+
+  const processedPrompt = template
+    .replace('{{comments}}', formattedComments)
+    .replace('{{files}}', files.join(', '))
+
+  return { prompt: processedPrompt, templateName }
+}
+
+export async function sendToAI(): Promise<void> {
+  if (!await ensureInitialized()) {
+    return
+  }
+
+  const treeProvider = getTreeDataProvider()
+  const categoryFilter = treeProvider?.getCategoryFilter()
+  let comments = getStorage().getAll()
+
+  if (categoryFilter) {
+    comments = comments.filter(c => c.category === categoryFilter)
+    await executeAIReview(comments, categoryFilter)
+  }
+  else {
+    await executeAIReview(comments)
+  }
+}
+
+async function executeAIReview(comments: Comment[], context: string = ''): Promise<void> {
+  if (comments.length === 0) {
+    window.showErrorMessage('No comments to send to AI')
+    return
+  }
+
+  const { formattedComments, files } = formatCommentsForAI(comments)
+  const promptResult = await pickPromptTemplate(formattedComments, files)
+
+  if (!promptResult) {
+    return
+  }
+
+  const { prompt, templateName } = promptResult
+
+  const config = workspace.getConfiguration()
+  let aiTool = config.get<string>(configs.aiTool.key, configs.aiTool.default)
+  const aiToolCommand = config.get<string>(configs.aiToolCommand.key, configs.aiToolCommand.default)
+
+  const showQuickPickForAI = config.get<boolean>(configs.showAIQuickPick.key, configs.showAIQuickPick.default)
+  if (showQuickPickForAI) {
+    const aiToolOptions = [
+      { label: 'OpenCode', value: AI_TOOLS.OPENCODE },
+      { label: 'Claude', value: AI_TOOLS.CLAUDE },
+      { label: 'Copilot', value: AI_TOOLS.COPILOT },
+      { label: 'Amp', value: AI_TOOLS.AMP },
+      { label: 'Custom', value: AI_TOOLS.CUSTOM },
+    ]
+
+    const selectedAITool = await window.showQuickPick(aiToolOptions, {
+      placeHolder: 'Select AI tool',
+      title: 'AI Tool Selection',
+    })
+
+    if (selectedAITool) {
+      aiTool = selectedAITool.value
+    }
+  }
+
+  const command = buildAICommand(aiTool, aiToolCommand, prompt)
+
+  const terminalName = generateTerminalName(templateName, aiTool)
+  const terminal = window.createTerminal(terminalName)
+  terminal.sendText(command)
+  terminal.show()
+
+  showCommentsSentMessage(comments.length, context)
+}
+
+export async function sendSelectedToAI(): Promise<void> {
+  if (!await ensureInitialized()) {
+    return
+  }
+
+  const storage = getStorage()
+  const allComments = storage.getAll()
+
+  if (allComments.length === 0) {
+    window.showErrorMessage('No comments to send to AI')
+    return
+  }
+
+  const commentsByFile = new Map<string, Comment[]>()
+  for (const comment of allComments) {
+    const existing = commentsByFile.get(comment.filePath) || []
+    existing.push(comment)
+    commentsByFile.set(comment.filePath, existing)
+  }
+
+  const quickPickItems: { label: string, description: string, comment: Comment }[] = []
+  for (const [filePath, fileComments] of commentsByFile) {
+    for (const comment of fileComments) {
+      const lineRange = comment.startLine === comment.endLine
+        ? `${comment.startLine}`
+        : `${comment.startLine}-${comment.endLine}`
+      const truncatedText = comment.text.length > 50 ? `${comment.text.slice(0, 50)}...` : comment.text
+      quickPickItems.push({
+        label: truncatedText,
+        description: `${filePath}:${lineRange}`,
+        comment,
+      })
+    }
+  }
+
+  const selectedItems = await window.showQuickPick(quickPickItems, {
+    canPickMany: true,
+    placeHolder: 'Select comments to send to AI',
+    title: 'Send Selected Comments to AI',
+  })
+
+  if (!selectedItems || selectedItems.length === 0) {
+    return
+  }
+
+  const selectedComments = selectedItems.map(item => item.comment)
+  await executeAIReview(selectedComments, 'selected')
+}
+
+export async function sendCategoryToAI(): Promise<void> {
+  if (!await ensureInitialized()) {
+    return
+  }
+
+  const allComments = getStorage().getAll()
+
+  if (allComments.length === 0) {
+    window.showErrorMessage('No comments to send to AI')
+    return
+  }
+
+  const selectedCategory = await window.showQuickPick(CATEGORY_ITEMS, {
+    placeHolder: 'Select category to send to AI',
+    title: 'Send Category to AI',
+  })
+
+  if (!selectedCategory) {
+    return
+  }
+
+  const filteredComments = allComments.filter(c => c.category === selectedCategory.value)
+
+  if (filteredComments.length === 0) {
+    window.showInformationMessage(`No ${selectedCategory.value} comments to send to AI`)
+    return
+  }
+
+  await executeAIReview(filteredComments, selectedCategory.value)
 }
 
 export function registerCommands(): void {
@@ -662,4 +879,7 @@ export function registerCommands(): void {
   commands.registerCommand('codeReview.exportMarkdown', exportMarkdown)
   commands.registerCommand('codeReview.exportHtml', exportHtml)
   commands.registerCommand('codeReview.clearAll', clearAll)
+  commands.registerCommand('codeReview.sendToAI', sendToAI)
+  commands.registerCommand('codeReview.sendSelectedToAI', sendSelectedToAI)
+  commands.registerCommand('codeReview.sendCategoryToAI', sendCategoryToAI)
 }

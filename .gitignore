@@ -12,4 +12,5 @@ node_modules
 temp
 src/generated
 .env
-.codereview/	
+.codereview
+.claude/settings.local.json

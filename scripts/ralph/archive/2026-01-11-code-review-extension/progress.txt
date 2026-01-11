@@ -1,0 +1,15 @@
+# Ralph Progress Log
+# Branch: ralph/ai-review
+# Started: 2026-01-11
+
+## Codebase Patterns
+- This project uses `reactive-vscode` for extension development
+- Use `workspace.fs` for all file operations (not Node.js fs)
+- Run `pnpm run typecheck` for type checking, `pnpm run build` for build
+- Use `pnpm eslint . --fix` to fix lint issues (not `pnpm run lint --fix`)
+- Run `pnpm run update` after modifying package.json commands/configs to regenerate meta.ts
+- Commands go in `src/commands.ts`, register them in `registerCommands()` function
+- Use `window.createTerminal()` for terminal operations
+- Use `defineConfig` from reactive-vscode for reading configuration values
+
+---

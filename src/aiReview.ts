@@ -42,12 +42,12 @@ export function buildAICommand(tool: string, customCommand: string, prompt: stri
 
   switch (tool) {
     case 'claude':
-      return `claude -p --permission-mode plan "${escapedPrompt}"`
+      return `claude --print --model haiku --permission-mode plan "${escapedPrompt}"`
     case 'opencode':
-      return `opencode run --agent plan "${escapedPrompt}"`
+      return `opencode run --model opencode/big-pickle "${escapedPrompt}"`
     case 'custom':
       return `${customCommand} "${escapedPrompt}"`
     default:
-      return `claude -p --permission-mode plan "${escapedPrompt}"`
+      return `opencode run --model opencode/big-pickle "${escapedPrompt}"`
   }
 }

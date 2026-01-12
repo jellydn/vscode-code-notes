@@ -15,7 +15,7 @@
       ],
       "priority": 1,
       "passes": true,
-      "notes": ""
+      "notes": "Implemented in package.json lines 334-340"
     },
     {
       "id": "US-002",
@@ -31,7 +31,7 @@
       ],
       "priority": 2,
       "passes": true,
-      "notes": ""
+      "notes": "Implemented in src/terminalProfile.ts"
     },
     {
       "id": "US-003",
@@ -45,7 +45,7 @@
       ],
       "priority": 3,
       "passes": true,
-      "notes": ""
+      "notes": "Implemented in src/terminalProfile.ts lines 29-32"
     },
     {
       "id": "US-004",
@@ -59,7 +59,7 @@
       ],
       "priority": 4,
       "passes": true,
-      "notes": ""
+      "notes": "Implemented in src/terminalProfile.ts lines 34-46"
     },
     {
       "id": "US-005",
@@ -75,7 +75,7 @@
       ],
       "priority": 5,
       "passes": true,
-      "notes": ""
+      "notes": "Implemented in src/commands.ts lines 808-826"
     },
     {
       "id": "US-006",
@@ -90,7 +90,7 @@
       ],
       "priority": 6,
       "passes": true,
-      "notes": ""
+      "notes": "14 tests passing in test/unit/terminalProfile.test.ts"
     }
   ]
 }

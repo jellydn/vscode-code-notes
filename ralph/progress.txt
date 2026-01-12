@@ -16,3 +16,15 @@ Thread: https://ampcode.com/threads/T-019bb1c7-072e-732b-8952-6b9a0f4ecc37
   - The vscode-ext-gen tool auto-generates TypeScript types for all config settings
   - New config appears as `configs.terminalProfile` with proper typing
 ---
+
+## 2026-01-12 - US-002
+Thread: https://ampcode.com/threads/T-019bb1c8-bda7-756b-88d3-fc1b94c7de87
+- Created src/terminalProfile.ts module with TerminalProfile type
+- Implemented isTmuxAvailable() using 'which tmux' with promisified exec
+- Implemented getSessionName() with sanitization: lowercase, replace special chars with hyphens, trim hyphens
+- Files changed: src/terminalProfile.ts
+- **Learnings for future iterations:**
+  - Use `node:child_process` and `node:util` Node protocol imports
+  - Promisify exec for async/await usage
+  - Sanitization pattern: lowercase -> replace non-alphanumeric with hyphens -> collapse multiple hyphens -> trim leading/trailing hyphens
+---

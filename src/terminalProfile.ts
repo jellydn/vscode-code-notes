@@ -24,3 +24,8 @@ export function getSessionName(workspaceName: string): string {
 
   return `sealcode-${sanitized || 'workspace'}`
 }
+
+export function buildTmuxCommand(sessionName: string, windowName: string, command: string): string {
+  const escapedCommand = command.replace(/'/g, `'\\''`)
+  return `tmux new-session -A -s ${sessionName} -n ${windowName} -d && tmux send-keys -t ${sessionName}:${windowName} '${escapedCommand}' Enter && tmux attach -t ${sessionName}`
+}
